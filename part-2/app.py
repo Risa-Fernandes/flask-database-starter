@@ -48,12 +48,27 @@ def init_db():
 
 @app.route('/add', methods=['GET', 'POST'])  # Allow both GET and POST
 def add_student():
-    if request.method == 'POST':  # Form was submitted
-        name = request.form['name']  # Get data from form field named 'name'
+    if request.method == 'POST':
+        name = request.form['name']
         email = request.form['email']
         course = request.form['course']
 
         conn = get_db_connection()
+        
+        # --- NEW VALIDATION LOGIC ---
+        # Check if the email already exists in the table
+        existing_student = conn.execute(
+            'SELECT id FROM students WHERE email = ?', (email,)
+        ).fetchone()
+
+        if existing_student:
+            conn.close()
+            # Flash a warning message and stay on the add page
+            flash('Error: This email is already registered!', 'danger')
+            return render_template('add.html', name=name, email=email, course=course)
+        # -----------------------------
+
+        # If email is unique, proceed to insert
         conn.execute(
             'INSERT INTO students (name, email, course) VALUES (?, ?, ?)',
             (name, email, course)
@@ -61,22 +76,33 @@ def add_student():
         conn.commit()
         conn.close()
 
-        flash('Student added successfully!', 'success')  # Show success message
-        return redirect(url_for('index'))  # Go back to home page
+        flash('Student added successfully!', 'success')
+        return redirect(url_for('index'))
 
-    return render_template('add.html')  # GET request: show empty form
-
-
+    return render_template('add.html')
 # =============================================================================
 # READ - Display all students
 # =============================================================================
 
 @app.route('/')
+@app.route('/')
 def index():
+    # Get the search query from the URL (e.g., /?search=John)
+    search_query = request.args.get('search', '')
+    
     conn = get_db_connection()
-    students = conn.execute('SELECT * FROM students ORDER BY id DESC').fetchall()  # Newest first
+    
+    if search_query:
+        # Use SQL LIKE with wildcards (%) to find partial matches
+        # The query finds names that contain the search string anywhere
+        query = "SELECT * FROM students WHERE name LIKE ? ORDER BY id DESC"
+        students = conn.execute(query, ('%' + search_query + '%',)).fetchall()
+    else:
+        # If no search, show all students
+        students = conn.execute('SELECT * FROM students ORDER BY id DESC').fetchall()
+        
     conn.close()
-    return render_template('index.html', students=students)
+    return render_template('index.html', students=students, search_query=search_query)
 
 
 # =============================================================================
@@ -121,6 +147,7 @@ def delete_student(id):
 
     flash('Student deleted!', 'danger')  # Show delete message
     return redirect(url_for('index'))
+
 
 
 if __name__ == '__main__':

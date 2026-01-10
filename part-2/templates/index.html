@@ -3,12 +3,13 @@
 <head>
     <title>Part 2 - Full CRUD Operations</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        body { font-family: Arial, sans-serif; margin: 40px; background: #c3f7d7; }
         h1 { color: #333; }
         table { border-collapse: collapse; width: 100%; background: white; margin-top: 20px; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #2196F3; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
+        th { background-color: #000000; color: white; }
+        tr:nth-child(even) { background-color: #d6d4d4; }
+        tr:nth-child(odd) { background-color: #bebebe; }
         .btn { display: inline-block; padding: 8px 16px; text-decoration: none; border-radius: 4px; margin: 2px; }
         .btn-add { background: #4CAF50; color: white; padding: 12px 24px; }
         .btn-edit { background: #2196F3; color: white; }
@@ -34,6 +35,12 @@
     {% endwith %}
 
     <a href="{{ url_for('add_student') }}" class="btn btn-add">+ Add New Student</a>
+
+    <form action="{{ url_for('index') }}" method="GET">
+        <input style="margin-bottom: 30px; height: 40px; margin-top: 30px; width: 800px; font-size: 18px; border: 2px solid; border-radius: 8px;" type="text" name="search" placeholder="  Search by name..." value="{{ search_query }}">
+        <button type="submit" class="btn btn-edit">Search</button>
+        <a href="{{ url_for('index') }}" class="btn btn-edit">Clear</a>
+    </form>
 
     {% if students %}
         <table>
@@ -61,8 +68,9 @@
     {% else %}
         <p class="empty">No students yet. Click "Add New Student" to create one!</p>
     {% endif %}
-
+    
     <hr>
+
     <p><strong>CRUD Operations:</strong> Create (Add) | Read (List) | Update (Edit) | Delete</p>
 </body>
 </html>

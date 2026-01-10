@@ -19,6 +19,15 @@
     </style>
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div style="padding: 10px; border-radius: 5px; margin-bottom: 20px; color: white; background-color: {{ 'red' if category == 'danger' else 'green' }};">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
     <h1>Add New Student</h1>
 
     <form method="POST">  <!-- POST sends data to server -->
