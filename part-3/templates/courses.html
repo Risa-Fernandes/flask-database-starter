@@ -22,6 +22,7 @@
     <nav>
         <a href="{{ url_for('index') }}">Students</a>
         <a href="{{ url_for('courses') }}">Courses</a>
+        <a href="{{ url_for('teachers') }}">Teachers</a>
     </nav>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -37,8 +38,15 @@
     {% for course in courses %}
     <div class="course-card">
         <h3>{{ course.name }}</h3>
+        <h4> Teacher - {% for teacher in course.teachers %}
+            {{ teacher.name }}{% if not loop.last %}, {% endif %}
+        {% else %}
+            No teacher assigned
+        {% endfor %} </h4>
+        
         <p>{{ course.description or 'No description' }}</p>
         <p>
+             
             <span class="student-count">{{ course.students|length }} students enrolled</span>
             <!-- course.students gives us all students in this course (relationship magic!) -->
         </p>

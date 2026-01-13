@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Part 3 - Flask-SQLAlchemy ORM</title>
+    <title>Teachers - Part 3</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; background: #f0f4f8; }
         h1 { color: #2c3e50; }
@@ -24,12 +24,11 @@
     </style>
 </head>
 <body>
-    <h1>Student Management (Part 3 - SQLAlchemy ORM)</h1>
+    <h1>Teacher Management</h1>
 
     <nav>
         <a href="{{ url_for('index') }}">Students</a>
         <a href="{{ url_for('courses') }}">Courses</a>
-        <a href="{{ url_for('teachers') }}">Teachers</a>
     </nav>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -40,9 +39,17 @@
         {% endif %}
     {% endwith %}
 
-    <a href="{{ url_for('add_student') }}" class="btn btn-add">+ Add New Student</a>
+    <a href="{{ url_for('add_teacher') }}" class="btn btn-add">+ Add New Teacher</a>
 
-    {% if students %}
+    <br><br>
+    <form action="{{ url_for('search_teachers') }}" method="GET" style="margin-bottom: 20px;">
+        <input style="margin-bottom: 30px; height: 40px; margin-top: 30px; width: 800px; font-size: 18px; border: 2px solid; border-radius: 8px;" type="text" name="q" placeholder=" Search by name..." value="{{ search_text }}">
+        <button class="btn btn-submit" type="submit">Search</button>
+        <a href="{{ url_for('search_teachers') }}">Clear</a>
+    </form>
+
+
+    {% if teachers %}
         <table>
             <tr>
                 <th>ID</th>
@@ -51,25 +58,25 @@
                 <th>Course</th>
                 <th>Actions</th>
             </tr>
-            {% for student in students %}
+            {% for teacher in teachers %}
             <tr>
-                <td>{{ student.id }}</td>  <!-- ORM uses dot notation! -->
-                <td>{{ student.name }}</td>
-                <td>{{ student.email }}</td>
-                <td><span class="course-badge">{{ student.course.name }}</span></td>  <!-- Access related course! -->
+                <td>{{ teacher.id }}</td>  <!-- ORM uses dot notation! -->
+                <td>{{ teacher.name }}</td>
+                <td>{{ teacher.email }}</td>
+                <td><span class="course-badge">{{ teacher.course.name }}</span></td>  <!-- Access related course! -->
                 <td>
-                    <a href="{{ url_for('edit_student', id=student.id) }}" class="btn btn-edit">Edit</a>
-                    <a href="{{ url_for('delete_student', id=student.id) }}" class="btn btn-delete"
-                       onclick="return confirm('Delete this student?')">Delete</a>
+                    <a href="{{ url_for('edit_teacher', id=teacher.id) }}" class="btn btn-edit">Edit</a>
+                    <a href="{{ url_for('delete_teacher', id=teacher.id) }}" class="btn btn-delete"
+                       onclick="return confirm('Delete this teacher?')">Delete</a>
                 </td>
             </tr>
             {% endfor %}
         </table>
     {% else %}
-        <p class="empty">No students yet. Add one!</p>
+        <p class="empty">No teachers yet. Add one!</p>
     {% endif %}
 
     <hr>
-    <p><strong>Notice:</strong> We use <code>student.course.name</code> to access the related course - that's the power of ORM relationships!</p>
+    <p><strong>Notice:</strong> We use <code>teacger.course.name</code> to access the related course - that's the power of ORM relationships!</p>
 </body>
 </html>
