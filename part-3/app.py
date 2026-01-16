@@ -19,7 +19,8 @@ from flask_sqlalchemy import SQLAlchemy  # Import SQLAlchemy
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
 
-# =============================================================================
+# ========================================
+# =====================================
 # DATABASE CONFIGURATION
 # =============================================================================
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///school.db'  # Database file
