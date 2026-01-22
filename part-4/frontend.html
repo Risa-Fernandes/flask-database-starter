@@ -13,42 +13,46 @@
         nav h2 { margin: 0; margin-right: auto; color: var(--accent); font-size: 1.2rem; }
         nav button { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
         nav button:hover { background: var(--accent); color: white; }
-        nav button i { margin-right: 8px; }
 
         /* Layout */
         .container { padding: 2rem; max-width: 1200px; margin: auto; }
         .view-section { display: none; }
         .active { display: block !important; }
-        
         .grid-layout { display: grid; grid-template-columns: 350px 1fr; gap: 30px; margin-top: 10px; }
         .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 180px; }
         
+        /* Sorting Bar */
+        .sort-bar { background: var(--card); padding: 12px 20px; border-radius: 10px; margin-bottom: 15px; display: flex; gap: 15px; align-items: center; border: 1px solid #334155; }
+        .sort-bar select { width: auto; margin: 0; }
+
         /* Forms & Inputs */
         .search-header { width: 100%; margin-bottom: 10px; position: relative; }
         .search-header i { position: absolute; left: 15px; top: 18px; color: #64748b; }
         .search-header input { padding-left: 40px; }
-
         input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
         .btn-main { background: var(--accent); color: #0f172a; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-cancel { background: #64748b; color: white; border: none; padding: 8px; width: 100%; border-radius: 6px; cursor: pointer; margin-top: 5px; display: none; }
 
-        /* Notification Area */
+        /* RESTORED BUTTON STYLES */
+        .btn-edit { background: var(--success); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .btn-del { background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+
+        .list-item { background: #334155; padding: 15px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent); }
+        .actions { display: flex; gap: 8px; }
+
+        /* Pagination */
+        .pagination-bar { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; padding: 15px; background: var(--card); border-radius: 12px; }
+        .page-numbers { display: flex; gap: 5px; }
+        .btn-pag { background: #334155; color: white; border: 1px solid #475569; padding: 8px 14px; border-radius: 6px; cursor: pointer; transition: 0.2s; min-width: 40px; }
+        .btn-pag:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+        .btn-pag.active-page { background: var(--accent); color: #0f172a; border-color: var(--accent); font-weight: bold; }
+        .btn-pag:disabled { opacity: 0.3; cursor: not-allowed; }
+
         .msg-area { height: 40px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 600; transition: opacity 0.3s ease; opacity: 0; }
         .msg-success { background: rgba(34, 197, 94, 0.2); color: var(--success); border: 1px solid var(--success); opacity: 1; }
         .msg-error { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); opacity: 1; }
-        .msg-area i { margin-right: 10px; }
-
-        /* List Styling */
-        .list-item { background: #334155; padding: 15px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent); }
-        .actions { display: flex; gap: 8px; }
-        .btn-edit { background: var(--success); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
-        .btn-del { background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
-        .btn-edit:hover, .btn-del:hover { opacity: 0.8; }
-        
-        /* Main Dashboard Stats */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .stat-box { text-align: center; padding: 40px; background: var(--card); border-radius: 15px; border: 1px solid #334155; position: relative; overflow: hidden; }
-        .stat-box i { position: absolute; font-size: 5rem; color: rgba(56, 189, 248, 0.05); right: -10px; bottom: -10px; }
+        .stat-box { text-align: center; padding: 40px; background: var(--card); border-radius: 15px; border: 1px solid #334155; }
         .stat-box h1 { font-size: 3rem; margin: 10px 0; color: var(--accent); }
     </style>
 </head>
@@ -66,111 +70,151 @@
         <div id="view-main" class="view-section active">
             <h1>System Overview</h1>
             <div class="stats-grid">
-                <div class="stat-box">
-                    <i class="fa-solid fa-users"></i>
-                    <h3>Total Authors</h3>
-                    <h1 id="stat-authors">0</h1>
-                </div>
-                <div class="stat-box">
-                    <i class="fa-solid fa-layer-group"></i>
-                    <h3>Total Books</h3>
-                    <h1 id="stat-books">0</h1>
-                </div>
+                <div class="stat-box"><h3>Total Authors</h3><h1 id="stat-authors">0</h1></div>
+                <div class="stat-box"><h3>Total Books</h3><h1 id="stat-books">0</h1></div>
             </div>
         </div>
 
         <div id="view-authors" class="view-section">
             <div class="search-header">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchAuthInput" placeholder="Search authors by name..." onkeyup="searchAuthors()">
+                <input type="text" id="searchAuthInput" placeholder="Search authors..." onkeyup="searchAuthors()">
             </div>
             <div id="authMsg" class="msg-area"></div>
-
             <div class="grid-layout">
                 <div class="card">
-                    <h3 id="authFormTitle"><i class="fa-solid fa-plus"></i> Add New Author</h3>
+                    <h3 id="authFormTitle">Add New Author</h3>
                     <input type="hidden" id="editAuthId">
                     <input type="text" id="authName" placeholder="Full Name">
                     <input type="text" id="authBio" placeholder="Biography">
                     <input type="text" id="authCity" placeholder="City">
-                    <button class="btn-main" id="authSubmitBtn" onclick="handleAuthorSubmit()">
-                        <i class="fa-solid fa-check"></i> <span>Create Author</span>
-                    </button>
-                    <button class="btn-cancel" id="authCancelBtn" onclick="resetAuthorForm()">
-                        <i class="fa-solid fa-xmark"></i> Cancel Edit
-                    </button>
+                    <button class="btn-main" onclick="handleAuthorSubmit()">Create Author</button>
+                    <button class="btn-cancel" id="authCancelBtn" onclick="resetAuthorForm()">Cancel Edit</button>
                 </div>
-                <div id="authorList"></div>
+                <div>
+                    <div class="sort-bar">
+                        <span>Sort By:</span>
+                        <select id="authSortCol" onchange="refreshAllData()">
+                            <option value="name">Name</option>
+                            <option value="city">City</option>
+                        </select>
+                        <select id="authSortOrder" onchange="refreshAllData()">
+                            <option value="asc">Ascending</option>
+                            <option value="desc">Descending</option>
+                        </select>
+                    </div>
+                    <div id="authorList"></div>
+                    <div class="pagination-bar">
+                        <button id="authPrevBtn" class="btn-pag" onclick="changeAuthPage(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                        <div id="authPageNumbers" class="page-numbers"></div>
+                        <button id="authNextBtn" class="btn-pag" onclick="changeAuthPage(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div id="view-books" class="view-section">
             <div class="search-header">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchBookInput" placeholder="Search books by title..." onkeyup="searchBooks()">
+                <input type="text" id="searchBookInput" placeholder="Search books..." onkeyup="searchBooks()">
             </div>
             <div id="bookMsg" class="msg-area"></div>
-
             <div class="grid-layout">
                 <div class="card">
-                    <h3 id="bookFormTitle"><i class="fa-solid fa-plus"></i> Add New Book</h3>
+                    <h3 id="bookFormTitle">Add New Book</h3>
                     <input type="hidden" id="editBookId">
                     <input type="text" id="bookTitle" placeholder="Book Title">
-                    <input type="number" id="bookYear" placeholder="Publication Year">
-                    <input type="text" id="bookIsbn" placeholder="ISBN Number">
+                    <input type="number" id="bookYear" placeholder="Year">
+                    <input type="text" id="bookIsbn" placeholder="ISBN">
                     <select id="authDropdown"><option value="">Select Author</option></select>
-                    <button class="btn-main" id="bookSubmitBtn" onclick="handleBookSubmit()">
-                        <i class="fa-solid fa-check"></i> <span>Add Book</span>
-                    </button>
-                    <button class="btn-cancel" id="bookCancelBtn" onclick="resetBookForm()">
-                        <i class="fa-solid fa-xmark"></i> Cancel Edit
-                    </button>
+                    <button class="btn-main" onclick="handleBookSubmit()">Add Book</button>
+                    <button class="btn-cancel" id="bookCancelBtn" onclick="resetBookForm()">Cancel Edit</button>
                 </div>
-                <div id="bookList"></div>
+                <div>
+                    <div class="sort-bar">
+                        <span>Sort By:</span>
+                        <select id="bookSortCol" onchange="refreshAllData()">
+                            <option value="title">Title</option>
+                            <option value="year">Year</option>
+                        </select>
+                        <select id="bookSortOrder" onchange="refreshAllData()">
+                            <option value="asc">Ascending</option>
+                            <option value="desc">Descending</option>
+                        </select>
+                    </div>
+                    <div id="bookList"></div>
+                    <div class="pagination-bar">
+                        <button id="prevBtn" class="btn-pag" onclick="changePage(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                        <div id="pageNumbers" class="page-numbers"></div>
+                        <button id="nextBtn" class="btn-pag" onclick="changePage(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const API = "http://127.0.0.1:5000/api";
-
-        function showStatus(message, type = 'success') {
-            const activeView = document.querySelector('.view-section.active').id;
-            let msgElement = (activeView === 'view-authors') ? document.getElementById('authMsg') : document.getElementById('bookMsg');
-            if(!msgElement) return;
-
-            const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
-            msgElement.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`;
-            msgElement.className = `msg-area ${type === 'success' ? 'msg-success' : 'msg-error'}`;
-            
-            setTimeout(() => {
-                msgElement.className = 'msg-area';
-                msgElement.innerHTML = '';
-            }, 3000);
-        }
-
-        function showView(viewName) {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById(`view-${viewName}`).classList.add('active');
-            refreshAllData();
-        }
+        let bookPage = 1, authPage = 1, perPage = 5;
 
         async function refreshAllData() {
             try {
-                const authors = (await (await fetch(`${API}/authors`)).json()).authors;
-                const books = (await (await fetch(`${API}/books`)).json()).books;
-                document.getElementById('stat-authors').innerText = authors.length;
-                document.getElementById('stat-books').innerText = books.length;
-                renderAuthors(authors);
-                renderBooks(books);
-                const select = document.getElementById('authDropdown');
-                select.innerHTML = authors.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+                const bSort = document.getElementById('bookSortCol').value;
+                const bOrder = document.getElementById('bookSortOrder').value;
+                const aSort = document.getElementById('authSortCol').value;
+                const aOrder = document.getElementById('authSortOrder').value;
+
+                const authRes = await fetch(`${API}/authors-with-sorting?page=${authPage}&per_page=${perPage}&sort=${aSort}&order=${aOrder}`);
+                const authData = await authRes.json();
+                
+                const bookRes = await fetch(`${API}/books-with-sorting?page=${bookPage}&per_page=${perPage}&sort=${bSort}&order=${bOrder}`);
+                const bookData = await bookRes.json();
+
+                document.getElementById('stat-authors').innerText = authData.total_authors;
+                document.getElementById('stat-books').innerText = bookData.total_books;
+
+                renderAuthors(authData.authors);
+                renderBooks(bookData.books);
+                
+                renderPageNumbers('pageNumbers', bookData.total_pages, bookData.current_page, 'goToPage');
+                renderPageNumbers('authPageNumbers', authData.total_pages, authData.current_page, 'goToAuthPage');
+                
+                document.getElementById('prevBtn').disabled = !bookData.has_prev;
+                document.getElementById('nextBtn').disabled = !bookData.has_next;
+                document.getElementById('authPrevBtn').disabled = !authData.has_prev;
+                document.getElementById('authNextBtn').disabled = !authData.has_next;
+
+                const allAuthRes = await fetch(`${API}/authors`);
+                const allAuthData = await allAuthRes.json();
+                document.getElementById('authDropdown').innerHTML = allAuthData.authors.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
             } catch (e) { console.error(e); }
         }
 
+        function renderPageNumbers(containerId, total, current, clickHandler) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = ""; 
+            for (let i = 1; i <= total; i++) {
+                const btn = document.createElement('button');
+                btn.innerText = i;
+                btn.className = `btn-pag ${i === current ? 'active-page' : ''}`;
+                btn.onclick = () => window[clickHandler](i);
+                container.appendChild(btn);
+            }
+        }
+
+        function goToPage(n) { bookPage = n; refreshAllData(); }
+        function changePage(s) { bookPage += s; refreshAllData(); }
+        function goToAuthPage(n) { authPage = n; refreshAllData(); }
+        function changeAuthPage(s) { authPage += s; refreshAllData(); }
+
+        function showView(view) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`view-${view}`).classList.add('active');
+            refreshAllData();
+        }
+
         function renderAuthors(data) {
-            const list = document.getElementById('authorList');
-            list.innerHTML = data.map(a => `
+            document.getElementById('authorList').innerHTML = data.map(a => `
                 <div class="list-item">
                     <div><strong>${a.name}</strong><br><small><i class="fa-solid fa-location-dot"></i> ${a.city}</small></div>
                     <div class="actions">
@@ -182,8 +226,7 @@
         }
 
         function renderBooks(data) {
-            const list = document.getElementById('bookList');
-            list.innerHTML = data.map(b => `
+            document.getElementById('bookList').innerHTML = data.map(b => `
                 <div class="list-item">
                     <div><strong>${b.title}</strong><br><small><i class="fa-solid fa-calendar-days"></i> ${b.year}</small></div>
                     <div class="actions">
@@ -194,85 +237,68 @@
             `).join('');
         }
 
-        async function prepareEditAuthor(id) {
-            const res = await fetch(`${API}/authors/${id}`);
-            const data = await res.json();
-            const a = data.author;
-            document.getElementById('editAuthId').value = a.id;
-            document.getElementById('authName').value = a.name;
-            document.getElementById('authBio').value = a.bio;
-            document.getElementById('authCity').value = a.city;
-            document.getElementById('authFormTitle').innerHTML = '<i class="fa-solid fa-user-gear"></i> Edit Author Details';
-            document.getElementById('authSubmitBtn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
-            document.getElementById('authCancelBtn').style.display = "block";
-            showStatus("Edit mode enabled");
-        }
-
-        function resetAuthorForm() {
-            document.getElementById('editAuthId').value = "";
-            document.getElementById('authName').value = "";
-            document.getElementById('authBio').value = "";
-            document.getElementById('authCity').value = "";
-            document.getElementById('authFormTitle').innerHTML = '<i class="fa-solid fa-plus"></i> Add New Author';
-            document.getElementById('authSubmitBtn').innerHTML = '<i class="fa-solid fa-check"></i> Create Author';
-            document.getElementById('authCancelBtn').style.display = "none";
+        function showStatus(message, type = 'success') {
+            const activeView = document.querySelector('.view-section.active').id;
+            let msgElement = (activeView === 'view-authors') ? document.getElementById('authMsg') : document.getElementById('bookMsg');
+            msgElement.innerHTML = message;
+            msgElement.className = `msg-area ${type === 'success' ? 'msg-success' : 'msg-error'}`;
+            setTimeout(() => { msgElement.className = 'msg-area'; }, 3000);
         }
 
         async function handleAuthorSubmit() {
             const id = document.getElementById('editAuthId').value;
             const payload = { name: document.getElementById('authName').value, bio: document.getElementById('authBio').value, city: document.getElementById('authCity').value };
-            const method = id ? 'PUT' : 'POST';
-            await fetch(id ? `${API}/authors/${id}` : `${API}/authors`, { method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-            showStatus(id ? "Author updated!" : "Author added!");
-            resetAuthorForm();
-            refreshAllData();
-        }
-
-        async function prepareEditBook(id) {
-            const res = await fetch(`${API}/books/${id}`);
-            const data = await res.json();
-            const b = data.book;
-            document.getElementById('editBookId').value = b.id;
-            document.getElementById('bookTitle').value = b.title;
-            document.getElementById('bookYear').value = b.year;
-            document.getElementById('bookIsbn').value = b.isbn;
-            document.getElementById('authDropdown').value = b.author_id;
-            document.getElementById('bookFormTitle').innerHTML = '<i class="fa-solid fa-file-pen"></i> Edit Book Details';
-            document.getElementById('bookSubmitBtn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
-            document.getElementById('bookCancelBtn').style.display = "block";
-            showStatus("Edit mode enabled");
-        }
-
-        function resetBookForm() {
-            document.getElementById('editBookId').value = "";
-            document.getElementById('bookTitle').value = "";
-            document.getElementById('bookYear').value = "";
-            document.getElementById('bookIsbn').value = "";
-            document.getElementById('bookFormTitle').innerHTML = '<i class="fa-solid fa-plus"></i> Add New Book';
-            document.getElementById('bookSubmitBtn').innerHTML = '<i class="fa-solid fa-check"></i> Add Book';
-            document.getElementById('bookCancelBtn').style.display = "none";
+            await fetch(id ? `${API}/authors/${id}` : `${API}/authors`, { method: id ? 'PUT' : 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+            showStatus(id ? "Author updated!" : "Author added!"); resetAuthorForm(); refreshAllData();
         }
 
         async function handleBookSubmit() {
             const id = document.getElementById('editBookId').value;
             const payload = { title: document.getElementById('bookTitle').value, year: document.getElementById('bookYear').value, isbn: document.getElementById('bookIsbn').value, author_id: document.getElementById('authDropdown').value };
-            const method = id ? 'PUT' : 'POST';
-            await fetch(id ? `${API}/books/${id}` : `${API}/books`, { method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-            showStatus(id ? "Book updated!" : "Book added!");
-            resetBookForm();
-            refreshAllData();
+            await fetch(id ? `${API}/books/${id}` : `${API}/books`, { method: id ? 'PUT' : 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+            showStatus(id ? "Book updated!" : "Book added!"); resetBookForm(); refreshAllData();
+        }
+
+        async function prepareEditAuthor(id) {
+            const res = await fetch(`${API}/authors/${id}`);
+            const data = await res.json();
+            document.getElementById('editAuthId').value = data.author.id;
+            document.getElementById('authName').value = data.author.name;
+            document.getElementById('authBio').value = data.author.bio;
+            document.getElementById('authCity').value = data.author.city;
+            document.getElementById('authCancelBtn').style.display = "block";
+        }
+
+        function resetAuthorForm() { 
+            document.getElementById('editAuthId').value = ""; document.getElementById('authName').value = ""; 
+            document.getElementById('authBio').value = ""; document.getElementById('authCity').value = ""; 
+            document.getElementById('authCancelBtn').style.display = "none";
+        }
+
+        async function prepareEditBook(id) {
+            const res = await fetch(`${API}/books/${id}`);
+            const data = await res.json();
+            document.getElementById('editBookId').value = data.book.id;
+            document.getElementById('bookTitle').value = data.book.title;
+            document.getElementById('bookYear').value = data.book.year;
+            document.getElementById('bookIsbn').value = data.book.isbn;
+            document.getElementById('authDropdown').value = data.book.author_id;
+            document.getElementById('bookCancelBtn').style.display = "block";
+        }
+
+        function resetBookForm() { 
+            document.getElementById('editBookId').value = ""; document.getElementById('bookTitle').value = ""; 
+            document.getElementById('bookYear').value = ""; document.getElementById('bookIsbn').value = ""; 
+            document.getElementById('bookCancelBtn').style.display = "none";
         }
 
         async function deleteItem(type, id) {
-            if(confirm("Confirm deletion?")) {
-                await fetch(`${API}/${type}/${id}`, { method: 'DELETE' });
-                showStatus(`${type === 'authors' ? 'Author' : 'Book'} removed.`);
-                refreshAllData();
-            }
+            if(confirm("Confirm deletion?")) { await fetch(`${API}/${type}/${id}`, { method: 'DELETE' }); refreshAllData(); }
         }
 
         async function searchAuthors() {
             const q = document.getElementById('searchAuthInput').value;
+            if(!q) { refreshAllData(); return; }
             const res = await fetch(`${API}/authors`);
             const data = await res.json();
             renderAuthors(data.authors.filter(a => a.name.toLowerCase().includes(q.toLowerCase())));
@@ -280,6 +306,7 @@
 
         async function searchBooks() {
             const q = document.getElementById('searchBookInput').value;
+            if(!q) { refreshAllData(); return; }
             const res = await fetch(`${API}/books/search?q=${q}`);
             const data = await res.json();
             renderBooks(data.books);

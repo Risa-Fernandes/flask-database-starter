@@ -186,6 +186,118 @@ def search_books():
     return jsonify({'success': True, 'count': len(results), 'books': [b.to_dict() for b in results]})
 
 
+
+@app.route('/api/books-with-pagination', methods=['GET'])
+def get_books_paginated():
+    # 1. Get 'page' and 'per_page' from the URL (e.g., ?page=1&per_page=5)
+    # default to page 1 and 5 items per page
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 5, type=int)
+
+    # 2. Use SQLAlchemy paginate
+    # error_out=False means if the user asks for page 500 but only 2 exist, it returns an empty list instead of a 404 error
+    pagination_obj = Book.query.paginate(page=page, per_page=per_page, error_out=False)
+
+    books = pagination_obj.items # The actual books for THIS page
+    
+    return jsonify({
+        "books": [b.to_dict() for b in books],
+        "total_pages": pagination_obj.pages,
+        "current_page": pagination_obj.page,
+        "total_books": pagination_obj.total,
+        "has_next": pagination_obj.has_next,
+        "has_prev": pagination_obj.has_prev
+    })
+
+
+
+
+@app.route('/api/authors-with-pagination', methods=['GET'])
+def get_authors_paginated():
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 5, type=int)
+    
+    # Replace this with your database query if using SQL, 
+    # e.g., Author.query.paginate(...)
+    # For a list-based approach:
+    all_authors = Author.query.all() 
+    total = len(all_authors)
+    
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_authors = all_authors[start:end]
+    
+    # Convert objects to dictionaries
+    authors_data = [
+        {"id": a.id, "name": a.name, "bio": a.bio, "city": a.city} 
+        for a in paginated_authors
+    ]
+
+    return jsonify({
+        "authors": authors_data,
+        "total_authors": total,
+        "current_page": page,
+        "total_pages": (total + per_page - 1) // per_page,
+        "has_next": end < total,
+        "has_prev": page > 1
+    })
+
+
+
+
+
+@app.route('/api/books-with-sorting', methods=['GET'])
+def get_books_sorted():
+    sort_by = request.args.get('sort', 'title')  # title, year
+    order = request.args.get('order', 'asc')
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 5, type=int)
+
+    # Use SQLAlchemy to sort and paginate
+    query = Book.query
+    if order == 'asc':
+        query = query.order_by(getattr(Book, sort_by).asc())
+    else:
+        query = query.order_by(getattr(Book, sort_by).desc())
+
+    paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    return jsonify({
+        "books": [{"id": b.id, "title": b.title, "year": b.year, "isbn": b.isbn, "author_id": b.author_id} for b in paginated.items],
+        "total_books": paginated.total,
+        "current_page": paginated.page,
+        "total_pages": paginated.pages,
+        "has_next": paginated.has_next,
+        "has_prev": paginated.has_prev
+    })
+
+@app.route('/api/authors-with-sorting', methods=['GET'])
+def get_authors_sorted():
+    sort_by = request.args.get('sort', 'name')  # name, city
+    order = request.args.get('order', 'asc')
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 5, type=int)
+
+    query = Author.query
+    if order == 'asc':
+        query = query.order_by(getattr(Author, sort_by).asc())
+    else:
+        query = query.order_by(getattr(Author, sort_by).desc())
+
+    paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    return jsonify({
+        "authors": [{"id": a.id, "name": a.name, "bio": a.bio, "city": a.city} for a in paginated.items],
+        "total_authors": paginated.total,
+        "current_page": paginated.page,
+        "total_pages": paginated.pages,
+        "has_next": paginated.has_next,
+        "has_prev": paginated.has_prev
+    })
+
+
+
+
 # =============================================================================
 # SIMPLE WEB PAGE FOR TESTING
 # =============================================================================
